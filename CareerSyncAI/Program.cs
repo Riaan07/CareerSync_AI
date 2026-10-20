@@ -15,8 +15,9 @@ builder.WebHost.UseUrls($"http://*:{port}");
 builder.Services.AddControllersWithViews();
 builder.Services.AddSignalR();
 
+// Updated to use PostgreSQL (Npgsql) for Render
 builder.Services.AddDbContext<CareerSyncDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
 builder.Services.AddScoped<IRepositoryWrapper, RepositoryWrapper>();
 
 builder.Services.AddScoped<IDocumentAnalysisService, DocumentAnalysisService>();
