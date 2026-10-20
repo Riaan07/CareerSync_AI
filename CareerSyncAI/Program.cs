@@ -8,6 +8,10 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Configure port for Render and other hosting platforms
+var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+builder.WebHost.UseUrls($"http://*:{port}");
+
 builder.Services.AddControllersWithViews();
 builder.Services.AddSignalR();
 
@@ -36,7 +40,6 @@ builder.Services
         options.ExpireTimeSpan = TimeSpan.FromDays(14);
         options.SlidingExpiration = true;
 
- 
         options.Events = new CookieAuthenticationEvents
         {
             OnValidatePrincipal = async context =>
