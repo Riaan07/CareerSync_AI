@@ -1,0 +1,65 @@
+@model GraduatesListViewModel
+@{
+    ViewData["Title"] = "Graduates";
+    ViewData["PageTitle"] = "Graduates";
+    ViewData["Active"] = "Graduates";
+    ViewData["UserName"] = User.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value ?? "Admin";
+    var nameForInitials = ViewData["UserName"] as string ?? "Admin";
+    ViewData["UserInitials"] = string.Join("", nameForInitials.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(p => p[0])).ToUpper();
+    Layout = "_AdminLayout";
+}
+
+@if (ViewData["StatusMessage"] is string status)
+{
+    <div class="status-banner">@status</div>
+}
+
+<div class="card">
+    <div class="card-head">
+        <div>
+            <h3>@(string.IsNullOrEmpty(Model.Search) ? "All graduates" : $"Graduates matching \"{Model.Search}\"")</h3>
+            <div class="meta">@Model.Graduates.TotalCount @(string.IsNullOrEmpty(Model.Search) ? "registered" : "matching") account@(Model.Graduates.TotalCount == 1 ? "" : "s")</div>
+        </div>
+        @if (!string.IsNullOrEmpty(Model.Search))
+        {
+            <a class="btn-text" asp-controller="Admin" asp-action="Graduates">Clear search</a>
+        }
+    </div>
+
+    @if (Model.Graduates.TotalCount > 0)
+    {
+        <table class="recent">
+            <tr><th>Name</th><th>Qualification</th><th>CVs</th><th>Analyses</th><th>Status</th><th>Joined</th><th></th></tr>
+            @foreach (var g in Model.Graduates.Items)
+            {
+                <tr>
+                    <td>
+                        <a asp-controller="Admin" asp-action="GraduateDetail" asp-route-id="@g.GraduateId" style="color:var(--navy); font-weight:600;">@g.FullName</a>
+                        <div class="sub">@g.Email</div>
+                    </td>
+                    <td>@(g.Qualification ?? "—")</td>
+                    <td class="mono">@g.CvCount</td>
+                    <td class="mono">@g.MatchCount</td>
+                    <td>
+                        <span class="status-dot" style="background:@(g.IsActive ? "var(--teal)" : "var(--slate-light)");"></span>@(g.IsActive ? "Active" : "Inactive")
+                    </td>
+                    <td>@g.CreatedAt.ToString("d MMM yyyy")</td>
+                    <td style="text-align:right;">
+                        <a class="btn-text" asp-controller="Admin" asp-action="GraduateDetail" asp-route-id="@g.GraduateId">View</a>
+                        &nbsp;·&nbsp;
+                        <form asp-controller="Admin" asp-action="DeleteGraduate" method="post" style="display:inline;"
+                              onsubmit="return confirm('Delete @g.FullName\'s account? This removes their CVs, analyses and messages permanently.');">
+                            <input type="hidden" name="id" value="@g.GraduateId" />
+                            <button type="submit" class="btn-text" style="color:var(--coral);">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </table>
+        @await Html.PartialAsync("_Pagination")
+    }
+    else
+    {
+        <p style="font-size:13.5px; color:var(--slate-light); margin:0;">@(string.IsNullOrEmpty(Model.Search) ? "No graduates have registered yet." : "No graduates match that search.")</p>
+    }
+</div>

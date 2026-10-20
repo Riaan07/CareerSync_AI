@@ -1,0 +1,67 @@
+@model ManageSecurityQuestionsViewModel
+@using CareerSyncAI.Services
+@{
+    ViewData["Title"] = "Security Questions";
+    ViewData["PageTitle"] = "Security Questions";
+    ViewData["Active"] = "ChangePassword";
+    var isAdmin = User.IsInRole("Admin");
+    ViewData["UserName"] = User.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value ?? "Account";
+    var nameForInitials = ViewData["UserName"] as string ?? "Account";
+    ViewData["UserInitials"] = string.Join("", nameForInitials.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(p => p[0])).ToUpper();
+    Layout = isAdmin ? "_AdminLayout" : "_AppUserLayout";
+}
+
+@if (ViewData["StatusMessage"] is string status)
+{
+    <div class="status-banner">@status</div>
+}
+
+<div class="form-page">
+    <div class="card">
+        <div class="card-head">
+            <div>
+                <h3>Security questions</h3>
+                <div class="meta">Used to recover your account if you forget your password. Saving replaces both answers.</div>
+            </div>
+        </div>
+
+        <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+
+        <form asp-controller="Account" asp-action="SecurityQuestions" method="post" autocomplete="off">
+            <div class="field">
+                <label asp-for="SecurityQuestion1"></label>
+                <select asp-for="SecurityQuestion1" asp-items="@(new SelectList(SecurityQuestions.All))">
+                    <option value="">Choose a question…</option>
+                </select>
+                <span asp-validation-for="SecurityQuestion1" class="hint" style="color:var(--coral);"></span>
+            </div>
+            <div class="field">
+                <label asp-for="SecurityAnswer1"></label>
+                <input asp-for="SecurityAnswer1" type="text" autocomplete="off" />
+                <span asp-validation-for="SecurityAnswer1" class="hint" style="color:var(--coral);"></span>
+            </div>
+            <div class="field">
+                <label asp-for="SecurityQuestion2"></label>
+                <select asp-for="SecurityQuestion2" asp-items="@(new SelectList(SecurityQuestions.All))">
+                    <option value="">Choose a different question…</option>
+                </select>
+                <span asp-validation-for="SecurityQuestion2" class="hint" style="color:var(--coral);"></span>
+            </div>
+            <div class="field">
+                <label asp-for="SecurityAnswer2"></label>
+                <input asp-for="SecurityAnswer2" type="text" autocomplete="off" />
+                <span asp-validation-for="SecurityAnswer2" class="hint" style="color:var(--coral);"></span>
+            </div>
+            <div class="field">
+                <label asp-for="CurrentPassword"></label>
+                <input asp-for="CurrentPassword" type="password" placeholder="••••••••••" />
+                <div class="hint">Needed to confirm it's you.</div>
+                <span asp-validation-for="CurrentPassword" class="hint" style="color:var(--coral);"></span>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block btn-lg">Save security questions</button>
+        </form>
+        <div style="margin-top:14px; font-size:13px;">
+            <a asp-controller="Account" asp-action="ChangePassword" style="color:var(--teal);">← Back to change password</a>
+        </div>
+    </div>
+</div>

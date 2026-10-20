@@ -1,0 +1,108 @@
+@model SkillsDictionaryViewModel
+@{
+    ViewData["Title"] = "Skills dictionary";
+    ViewData["PageTitle"] = "Skills dictionary";
+    ViewData["Active"] = "SkillsDictionary";
+    ViewData["UserName"] = User.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value ?? "Admin";
+    var nameForInitials = ViewData["UserName"] as string ?? "Admin";
+    ViewData["UserInitials"] = string.Join("", nameForInitials.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(p => p[0])).ToUpper();
+    Layout = "_AdminLayout";
+
+    string FilterClass(string f) => Model.Filter == f ? "btn btn-primary" : "btn btn-ghost";
+}
+
+@if (ViewData["StatusMessage"] is string status)
+{
+    <div class="status-banner">@status</div>
+}
+
+<div class="card" style="margin-bottom:20px;">
+    <div class="card-head">
+        <div>
+            <h3>Add a term</h3>
+            <div class="meta">The analysis engine matches these as whole words in CV and job-description text. New terms apply to future analyses only.</div>
+        </div>
+    </div>
+
+    <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+
+    <form asp-controller="Admin" asp-action="AddSkillTerm" method="post">
+        <div style="display:flex; gap:14px; align-items:flex-start; flex-wrap:wrap;">
+            <div class="field" style="flex:1 1 260px; margin-bottom:0;">
+                <label asp-for="NewTerm.Term"></label>
+                <input asp-for="NewTerm.Term" type="text" placeholder="e.g. Blazor, BSc Honours Computer Science" maxlength="100" />
+                <span asp-validation-for="NewTerm.Term" class="hint" style="color:var(--coral);"></span>
+            </div>
+            <div style="flex:0 0 auto; padding-top:28px;">
+                <button type="submit" class="btn btn-primary">Add term</button>
+            </div>
+        </div>
+        <label style="display:inline-flex; align-items:center; gap:8px; margin-top:12px; font-size:13px;">
+            <input asp-for="NewTerm.IsQualification" /> This is a qualification (not a skill)
+        </label>
+    </form>
+</div>
+
+<div class="card">
+    <div class="card-head">
+        <div>
+            <h3>Dictionary terms</h3>
+            <div class="meta">@Model.SkillCount skill@(Model.SkillCount == 1 ? "" : "s") · @Model.QualificationCount qualification@(Model.QualificationCount == 1 ? "" : "s")</div>
+        </div>
+    </div>
+
+    <form asp-controller="Admin" asp-action="SkillsDictionary" method="get"
+          style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:16px;">
+        <input type="hidden" name="filter" value="@Model.Filter" />
+        <div class="search-box" style="flex:1 1 240px;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#93A2AF" stroke-width="2"><circle cx="11" cy="11" r="7" /><path d="M21 21l-4-4" /></svg>
+            <input name="search" value="@Model.Search" placeholder="Search terms…" />
+        </div>
+        <button type="submit" class="btn btn-ghost" style="padding:8px 16px; font-size:13px;">Search</button>
+        @if (!string.IsNullOrWhiteSpace(Model.Search))
+        {
+            <a class="btn-text" asp-action="SkillsDictionary" asp-route-filter="@Model.Filter">Clear</a>
+        }
+    </form>
+
+    <div style="display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap;">
+        <a class="@FilterClass("all")" style="padding:7px 14px; font-size:12.5px;" asp-action="SkillsDictionary" asp-route-search="@Model.Search" asp-route-filter="all">All</a>
+        <a class="@FilterClass("skills")" style="padding:7px 14px; font-size:12.5px;" asp-action="SkillsDictionary" asp-route-search="@Model.Search" asp-route-filter="skills">Skills</a>
+        <a class="@FilterClass("qualifications")" style="padding:7px 14px; font-size:12.5px;" asp-action="SkillsDictionary" asp-route-search="@Model.Search" asp-route-filter="qualifications">Qualifications</a>
+    </div>
+
+    @if (Model.Terms.TotalCount > 0)
+    {
+        <div style="overflow-x:auto;">
+            <table class="recent">
+                <tr><th>Term</th><th>Type</th><th></th></tr>
+                @foreach (var t in Model.Terms.Items)
+                {
+                    <tr>
+                        <td style="font-weight:600; color:var(--ink);">@t.Term</td>
+                        <td>
+                            <span class="role-badge @(t.IsQualification ? "role-admin" : "role-grad")">@(t.IsQualification ? "QUALIFICATION" : "SKILL")</span>
+                        </td>
+                        <td style="text-align:right;">
+                            <form asp-controller="Admin" asp-action="DeleteSkillTerm" method="post" style="display:inline;"
+                                  onsubmit="return confirm('Remove this term? CVs and job descriptions analysed from now on will no longer detect it.');">
+                                <input type="hidden" name="id" value="@t.Id" />
+                                <input type="hidden" name="search" value="@Model.Search" />
+                                <input type="hidden" name="filter" value="@Model.Filter" />
+                                <input type="hidden" name="page" value="@Model.Terms.PageNumber" />
+                                <button type="submit" class="btn-text" style="color:var(--coral);">Remove</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </table>
+        </div>
+        @await Html.PartialAsync("_Pagination")
+    }
+    else
+    {
+        <p style="font-size:13.5px; color:var(--slate-light); margin:0;">
+            @(string.IsNullOrWhiteSpace(Model.Search) ? "No terms in this category yet." : $"No terms match \"{Model.Search}\".")
+        </p>
+    }
+</div>

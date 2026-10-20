@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] — CareerSync AI</title>
+    <link rel="stylesheet" href="~/css/custom.css" asp-append-version="true" />
+</head>
+<body>
+    @{
+        // Pages with longer forms (Register) set ViewData["AuthVariant"] = "wide"
+        // to get a narrower brand panel and a two-column form card.
+        var isWide = ViewData["AuthVariant"] as string == "wide";
+    }
+    <div class="auth-shell @(isWide ? "auth-shell-wide" : "")">
+        <div class="auth-brand">
+            <a asp-area="" asp-controller="Home" asp-action="Index">
+                @await Html.PartialAsync("_Logo", "dark")
+            </a>
+            <div class="auth-quote">
+                <div class="big">"Match score: 78%. Missing: SQL Server, unit testing. Recommended: two short courses."</div>
+                <div class="cap">— EXACTLY WHAT A GRADUATE SEES AFTER ONE UPLOAD</div>
+            </div>
+            <div style="font-size:12.5px; color:#7E93AE;">Department of Computer Science &amp; Informatics — University of the Free State</div>
+            <svg class="auth-ring-deco" width="260" height="260" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="40" stroke="rgba(255,255,255,0.08)" stroke-width="10" fill="none" />
+                <circle cx="50" cy="50" r="40" stroke="rgba(59,199,184,0.35)" stroke-width="10" fill="none"
+                        stroke-linecap="round" stroke-dasharray="150 251" transform="rotate(-90 50 50)" />
+            </svg>
+        </div>
+        <div class="auth-form-wrap">
+            <div class="auth-card @(isWide ? "auth-card-wide" : "")">
+                @RenderBody()
+            </div>
+        </div>
+    </div>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

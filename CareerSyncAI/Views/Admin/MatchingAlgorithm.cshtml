@@ -1,0 +1,92 @@
+@model MatchingAlgorithmViewModel
+@{
+    ViewData["Title"] = "Matching algorithm";
+    ViewData["PageTitle"] = "Matching algorithm";
+    ViewData["Active"] = "MatchingAlgorithm";
+    ViewData["UserName"] = User.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value ?? "Admin";
+    var nameForInitials = ViewData["UserName"] as string ?? "Admin";
+    ViewData["UserInitials"] = string.Join("", nameForInitials.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(p => p[0])).ToUpper();
+    Layout = "_AdminLayout";
+}
+
+@if (ViewData["StatusMessage"] is string status)
+{
+    <div class="status-banner">@status</div>
+}
+
+<div class="form-page">
+    <div class="card">
+        <div class="card-head">
+            <div>
+                <h3>Score weighting</h3>
+                <div class="meta">
+                    How much each category counts toward a graduate's overall match score. The three values must add up to 100.
+                    @if (Model.LastUpdatedAt is DateTime updated)
+                    {
+                        <br />@($"Last changed {updated.ToLocalTime():d MMM yyyy, HH:mm}{(Model.LastUpdatedBy != null ? " by " + Model.LastUpdatedBy : "")}.")
+                    }
+                    else
+                    {
+                        <br /><span>Using the default weighting (50 / 25 / 25).</span>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+
+        <form asp-controller="Admin" asp-action="MatchingAlgorithm" method="post" id="weights-form">
+            <div class="field-grid" style="grid-template-columns:1fr 1fr 1fr;">
+                <div class="field">
+                    <label asp-for="TechnicalSkillsWeight"></label>
+                    <input asp-for="TechnicalSkillsWeight" type="number" min="0" max="100" step="1" data-weight />
+                    <span asp-validation-for="TechnicalSkillsWeight" class="hint" style="color:var(--coral);"></span>
+                </div>
+                <div class="field">
+                    <label asp-for="ExperienceWeight"></label>
+                    <input asp-for="ExperienceWeight" type="number" min="0" max="100" step="1" data-weight />
+                    <span asp-validation-for="ExperienceWeight" class="hint" style="color:var(--coral);"></span>
+                </div>
+                <div class="field">
+                    <label asp-for="QualificationsWeight"></label>
+                    <input asp-for="QualificationsWeight" type="number" min="0" max="100" step="1" data-weight />
+                    <span asp-validation-for="QualificationsWeight" class="hint" style="color:var(--coral);"></span>
+                </div>
+            </div>
+
+            <div class="bar-row">
+                <div class="bar-top"><span>Total</span><span class="mono" id="weight-total">@(Model.TechnicalSkillsWeight + Model.ExperienceWeight + Model.QualificationsWeight)%</span></div>
+                <div class="bar-track"><div class="bar-fill" id="weight-bar" style="width:@(Math.Min(100, Model.TechnicalSkillsWeight + Model.ExperienceWeight + Model.QualificationsWeight))%;"></div></div>
+            </div>
+
+            <label style="display:flex; align-items:flex-start; gap:8px; font-size:13px; margin:6px 0 18px;">
+                <input asp-for="RecalculateExisting" style="margin-top:3px;" />
+                <span>
+                    Also recalculate every existing match score with these weights
+                    <span style="color:var(--slate-light);">(@Model.ExistingMatchCount result@(Model.ExistingMatchCount == 1 ? "" : "s")). Otherwise only new analyses use them.</span>
+                </span>
+            </label>
+
+            <button type="submit" class="btn btn-primary btn-block btn-lg">Save weights</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Live total so Admin can see at a glance whether the weights add up to 100.
+    (function () {
+        var inputs = document.querySelectorAll("#weights-form [data-weight]");
+        var total = document.getElementById("weight-total");
+        var bar = document.getElementById("weight-bar");
+        function update() {
+            var sum = 0;
+            inputs.forEach(function (i) { sum += parseInt(i.value || "0", 10) || 0; });
+            total.textContent = sum + "%";
+            total.style.color = sum === 100 ? "" : "var(--coral)";
+            bar.style.width = Math.min(100, sum) + "%";
+            bar.style.background = sum === 100 ? "" : "var(--coral)";
+        }
+        inputs.forEach(function (i) { i.addEventListener("input", update); });
+        update();
+    })();
+</script>

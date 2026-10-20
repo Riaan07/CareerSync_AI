@@ -1,0 +1,60 @@
+<!--
+Dlamini SR
+2018287165
+CareerSync AI
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] — CareerSync AI</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="~/css/custom.css" asp-append-version="true" />
+
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+<body>
+    <nav class="site-nav">
+        <a asp-area="" asp-controller="Home" asp-action="Index">
+            @await Html.PartialAsync("_Logo")
+        </a>
+        
+        <div class="nav-links">
+            <a asp-controller="Home" asp-action="Index">For UFS graduates</a>
+            <a asp-controller="Home" asp-action="About">About</a>
+            <a asp-controller="Home" asp-action="FAQs">FAQs</a>
+        </div>
+        <div class="nav-actions">
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <a class="btn btn-teal" asp-controller="@(User.IsInRole("Admin") ? "Admin" : "AppUser")" asp-action="Index">Go to dashboard</a>
+            }
+            else
+            {
+                <a class="btn-text" asp-controller="Account" asp-action="Login">Sign in</a>
+                <a class="btn btn-teal" asp-controller="Account" asp-action="Register">Get started</a>
+            }
+        </div>
+    </nav>
+
+    <main>
+        @RenderBody()
+    </main>
+
+    <footer class="site-footer">
+        <span>CareerSync AI — an Honours project, Department of Computer Science &amp; Informatics, UFS</span>
+        <span>&copy; @DateTime.Now.Year</span>
+
+        <!-- Bootstrap Bundle JS -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    </footer>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

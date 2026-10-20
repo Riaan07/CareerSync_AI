@@ -1,0 +1,52 @@
+@model AnalyzeCvViewModel
+@{
+    ViewData["Title"] = "Analyse Your CV";
+    ViewData["PageTitle"] = "Analyse Your CV";
+    ViewData["Active"] = "Analyze";
+    Layout = "_AppUserLayout";
+}
+
+<div class="form-page">
+    <div class="card">
+        <div class="card-head">
+            <div>
+                <h3>Analyse your CV against a job</h3>
+                <div class="meta">Upload your CV and paste the job you want to apply for — the algorithm scores the match, finds the gaps, and recommends how to close them.</div>
+            </div>
+        </div>
+
+        <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+
+        <form asp-controller="AppUser" asp-action="Analyze" method="post" enctype="multipart/form-data">
+            <div class="meta" style="font-family:'IBM Plex Mono'; font-size:11px; letter-spacing:.06em; color:var(--teal-dark); margin-bottom:10px;">STEP 1 — YOUR CV</div>
+            <div class="field">
+                <label asp-for="CvFile"></label>
+                <input asp-for="CvFile" type="file" accept=".pdf,.txt,application/pdf,text/plain" />
+                <div class="hint">PDF or .txt, up to 5 MB. Scanned (photographed) CVs can't be read, so upload the PDF saved from Word or Google Docs, or paste the text below.</div>
+                <span asp-validation-for="CvFile" class="hint" style="color:var(--coral);"></span>
+            </div>
+            <div class="field">
+                <label asp-for="PastedCvText"></label>
+                <textarea asp-for="PastedCvText" rows="7" placeholder="Paste your CV text here — skills, qualifications, experience..."></textarea>
+            </div>
+
+            <div class="meta" style="font-family:'IBM Plex Mono'; font-size:11px; letter-spacing:.06em; color:var(--teal-dark); margin:22px 0 10px;">STEP 2 — THE JOB YOU'RE APPLYING FOR</div>
+            <div class="field">
+                <label asp-for="JobTitle"></label>
+                <input asp-for="JobTitle" type="text" placeholder="" />
+                <span asp-validation-for="JobTitle" class="hint" style="color:var(--coral);"></span>
+            </div>
+            <div class="field">
+                <label asp-for="Company"></label>
+                <input asp-for="Company" type="text" placeholder="" />
+            </div>
+            <div class="field">
+                <label asp-for="JobDescriptionText"></label>
+                <textarea asp-for="JobDescriptionText" rows="8" placeholder="Paste the full job description here..."></textarea>
+                <span asp-validation-for="JobDescriptionText" class="hint" style="color:var(--coral);"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block btn-lg">Analyse match</button>
+        </form>
+    </div>
+</div>

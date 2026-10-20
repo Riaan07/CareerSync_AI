@@ -1,0 +1,73 @@
+@model AdminProfileViewModel
+@{
+    ViewData["Title"] = "Profile";
+    ViewData["PageTitle"] = "Profile";
+    ViewData["Active"] = "Profile";
+    ViewData["UserName"] = Model.FullName;
+    ViewData["UserInitials"] = string.Join("", Model.FullName.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(p => p[0])).ToUpper();
+    Layout = "_AdminLayout";
+    var initials = ViewData["UserInitials"] as string;
+}
+
+@if (ViewData["StatusMessage"] is string status)
+{
+    <div class="status-banner">@status</div>
+}
+
+<div class="form-page-wide">
+    <div class="card">
+        <div class="profile-hero">
+            <div class="avatar" style="background:linear-gradient(135deg,var(--navy),var(--slate));">@initials</div>
+            <div>
+                <h2>@Model.FullName</h2>
+                <div class="hero-email">Administrator account</div>
+            </div>
+        </div>
+
+        <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+
+        <form asp-controller="Admin" asp-action="Profile" method="post">
+
+            <div class="field-section-label">CONTACT DETAILS</div>
+            <div class="field-grid">
+                <div class="field field-full">
+                    <label asp-for="FullName"></label>
+                    <div class="input-icon-wrap">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#93A2AF" stroke-width="2"><circle cx="12" cy="8" r="4" /><path d="M4 21c0-4 4-6 8-6s8 2 8 6" /></svg>
+                        <input asp-for="FullName" type="text" />
+                    </div>
+                    <span asp-validation-for="FullName" class="hint" style="color:var(--coral);"></span>
+                </div>
+                <div class="field">
+                    <label>Email</label>
+                    <div class="input-icon-wrap">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#93A2AF" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2" /><path d="M2 6l10 7 10-7" /></svg>
+                        <input value="@Model.Email" type="email" disabled style="background:#EDF1F4; color:var(--slate);" />
+                    </div>
+                    <div class="hint">Your sign-in — contact support to change it.</div>
+                </div>
+                <div class="field">
+                    <label asp-for="PhoneNumber"></label>
+                    <div class="input-icon-wrap">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#93A2AF" stroke-width="2"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012.1 4.2 2 2 0 014.1 2h3a2 2 0 012 1.7c.1.9.3 1.8.6 2.7a2 2 0 01-.5 2.1L8 9.7a16 16 0 006 6l1.2-1.2a2 2 0 012.1-.5c.9.3 1.8.5 2.7.6a2 2 0 011.7 2z" /></svg>
+                        <input asp-for="PhoneNumber" type="tel" placeholder="000 000 0000" />
+                    </div>
+                    <span asp-validation-for="PhoneNumber" class="hint" style="color:var(--coral);"></span>
+                </div>
+            </div>
+
+            <div class="field-section-label">ORGANISATION</div>
+            <div class="field-grid">
+                <div class="field field-full">
+                    <label asp-for="Department"></label>
+                    <div class="input-icon-wrap">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#93A2AF" stroke-width="2"><path d="M3 21V8l9-5 9 5v13" /><path d="M9 21v-6h6v6" /></svg>
+                        <input asp-for="Department" type="text" placeholder="Careers &amp; Employability Office" />
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-lg" style="margin-top:8px; min-width:200px;">Save changes</button>
+        </form>
+    </div>
+</div>

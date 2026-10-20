@@ -1,0 +1,90 @@
+@model RegisterViewModel
+@using CareerSyncAI.Services
+@{
+    ViewData["Title"] = "Create account";
+    ViewData["AuthVariant"] = "wide";
+    Layout = "_AuthLayout";
+    var questions = new SelectList(SecurityQuestions.All);
+}
+
+<h2>Create your account</h2>
+<div class="sub">Free for UFS graduates and current students.</div>
+<div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+
+<form asp-controller="Account" asp-action="Register" method="post">
+    <div class="field-grid">
+        <div class="field">
+            <label asp-for="FullName"></label>
+            <input asp-for="FullName" type="text" autocomplete="name" placeholder="" />
+            <span asp-validation-for="FullName" class="hint" style="color:var(--coral);"></span>
+        </div>
+        <div class="field">
+            <label asp-for="Email"></label>
+            <input asp-for="Email" type="email" autocomplete="email" placeholder="" />
+            <span asp-validation-for="Email" class="hint" style="color:var(--coral);"></span>
+        </div>
+    </div>
+
+    <div class="field-grid">
+        <div class="field">
+            <label asp-for="PhoneNumber"></label>
+            <input asp-for="PhoneNumber" type="tel" autocomplete="tel" placeholder="" title="We'll text a code to this number if you ever forget your password." />
+            <span asp-validation-for="PhoneNumber" class="hint" style="color:var(--coral);"></span>
+        </div>
+        <div class="field">
+            <label asp-for="Qualification"></label>
+            <input asp-for="Qualification" type="text" placeholder="" />
+        </div>
+    </div>
+
+    <div class="field-grid">
+        <div class="field">
+            <label asp-for="Password"></label>
+            <input asp-for="Password" type="password" autocomplete="new-password"
+                   placeholder="8+ characters" title="At least 8 characters — use a mix of letters, numbers and a symbol." />
+            <span asp-validation-for="Password" class="hint" style="color:var(--coral);"></span>
+        </div>
+        <div class="field">
+            <label asp-for="ConfirmPassword"></label>
+            <input asp-for="ConfirmPassword" type="password" autocomplete="new-password" placeholder="••••••••••" />
+            <span asp-validation-for="ConfirmPassword" class="hint" style="color:var(--coral);"></span>
+        </div>
+    </div>
+
+    <div class="form-section">
+        <div class="field-section-label">SECURITY QUESTIONS</div>
+        <div class="note">Used to reset your password. Capitals and extra spaces in answers don't matter.</div>
+    </div>
+
+    <div class="field-grid qa">
+        <div class="field">
+            <label asp-for="SecurityQuestion1"></label>
+            <select asp-for="SecurityQuestion1" asp-items="questions">
+                <option value="">Choose a question…</option>
+            </select>
+            <span asp-validation-for="SecurityQuestion1" class="hint" style="color:var(--coral);"></span>
+        </div>
+        <div class="field">
+            <label asp-for="SecurityAnswer1"></label>
+            <input asp-for="SecurityAnswer1" type="text" autocomplete="off" />
+            <span asp-validation-for="SecurityAnswer1" class="hint" style="color:var(--coral);"></span>
+        </div>
+    </div>
+    <div class="field-grid qa">
+        <div class="field">
+            <label asp-for="SecurityQuestion2"></label>
+            <select asp-for="SecurityQuestion2" asp-items="questions">
+                <option value="">Choose a different question…</option>
+            </select>
+            <span asp-validation-for="SecurityQuestion2" class="hint" style="color:var(--coral);"></span>
+        </div>
+        <div class="field">
+            <label asp-for="SecurityAnswer2"></label>
+            <input asp-for="SecurityAnswer2" type="text" autocomplete="off" />
+            <span asp-validation-for="SecurityAnswer2" class="hint" style="color:var(--coral);"></span>
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-teal btn-block btn-lg">Create account</button>
+</form>
+<div class="switch-line">Already have an account? <b><a asp-controller="Account" asp-action="Login" style="color:var(--teal);">Sign in</a></b></div>

@@ -1,0 +1,87 @@
+@model MatchHistoryViewModel
+@{
+    ViewData["Title"] = "My analyses";
+    ViewData["PageTitle"] = "My analyses";
+    ViewData["Active"] = "History";
+    ViewData["UserName"] = User.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value ?? "Graduate";
+    var nameForInitials = ViewData["UserName"] as string ?? "Graduate";
+    ViewData["UserInitials"] = string.Join("", nameForInitials.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(p => p[0])).ToUpper();
+    Layout = "_AppUserLayout";
+}
+
+@if (TempData["StatusMessage"] is string status)
+{
+    <div class="status-banner">@status</div>
+}
+
+<div class="card">
+    <div class="card-head">
+        <div>
+            <h3>@(string.IsNullOrEmpty(Model.Search) ? "All analyses" : $"Results for \"{Model.Search}\"")</h3>
+            <div class="meta">@Model.Matches.TotalCount analys@(Model.Matches.TotalCount == 1 ? "is" : "es")@(string.IsNullOrEmpty(Model.Search) ? "" : " match your search — job title, company, CV or skill")</div>
+        </div>
+        @if (!string.IsNullOrEmpty(Model.Search))
+        {
+            <a class="btn-text" asp-controller="AppUser" asp-action="History">Clear search</a>
+        }
+        else
+        {
+            <a class="btn btn-primary" style="padding:9px 16px; font-size:13px;" asp-controller="AppUser" asp-action="Analyze">+ New analysis</a>
+        }
+    </div>
+
+    @if (Model.Matches.TotalCount > 0)
+    {
+        <div style="overflow-x:auto;">
+            <table class="recent">
+                <tr><th>Job</th><th>CV</th><th>Date</th><th>Gaps</th><th>Score</th><th></th></tr>
+                @foreach (var m in Model.Matches.Items)
+                {
+                    var badgeColor = m.Score >= 70 ? "background:rgba(14,156,143,0.1); color:var(--teal-dark);"
+                                   : m.Score >= 50 ? "background:rgba(242,163,64,0.15); color:#C97F1F;"
+                                   : "background:rgba(232,92,74,0.12); color:var(--coral);";
+                    <tr>
+                        <td>
+                            <a asp-controller="AppUser" asp-action="MatchDetail" asp-route-id="@m.MatchId" style="color:var(--navy); font-weight:600;">@m.JobTitle</a>
+                            <div class="sub">@m.Company</div>
+                        </td>
+                        <td>@m.CvFileName</td>
+                        <td>@m.Date.ToString("d MMM yyyy")</td>
+                        <td class="mono">@m.GapCount</td>
+                        <td><span class="score-badge" style="@badgeColor">@m.Score%</span></td>
+                        <td style="text-align:right;"><a class="btn-text" asp-controller="AppUser" asp-action="MatchDetail" asp-route-id="@m.MatchId">View →</a></td>
+                    </tr>
+                }
+            </table>
+        </div>
+        @await Html.PartialAsync("_Pagination")
+    }
+    else
+    {
+        <p style="font-size:13.5px; color:var(--slate-light); margin:0;">
+            @(string.IsNullOrEmpty(Model.Search) ? "You haven't run any analyses yet." : "None of your analyses match that search.")
+        </p>
+    }
+</div>
+
+@if (Model.MatchingCourses.Count > 0)
+{
+    <div class="card" style="margin-top:20px;">
+        <div class="card-head"><div><h3>Courses &amp; certificates</h3><div class="meta">Learning resources matching "@Model.Search"</div></div></div>
+        @foreach (var r in Model.MatchingCourses)
+        {
+            <div class="learn-item">
+                <div>
+                    <span class="learn-tag learn-tag-gap">@r.SkillName.ToUpper()</span>
+                    @if (r.Type == LearningResourceType.Certification)
+                    {
+                        <span class="learn-tag" style="background:rgba(242,163,64,0.16); color:#C97F1F;">CERTIFICATE</span>
+                    }
+                    <h4>@r.Title</h4>
+                    <div class="meta">@r.Provider &middot; @r.DurationHours hrs</div>
+                </div>
+                <a class="go" href="@r.Url" target="_blank" rel="noopener">Start →</a>
+            </div>
+        }
+    </div>
+}

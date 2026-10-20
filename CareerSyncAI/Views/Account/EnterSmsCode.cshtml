@@ -1,0 +1,40 @@
+@model VerifySmsCodeViewModel
+@{
+    ViewData["Title"] = "Enter your code";
+    Layout = "_AuthLayout";
+}
+
+<h2>Enter your code</h2>
+<div class="sub">
+    If <b>@Model.Email</b> belongs to an account with a mobile number, we've texted a 6-digit code to it.
+    The code expires in 10 minutes.
+</div>
+
+@if (ViewData["StatusMessage"] is string status)
+{
+    <div class="status-banner">@status</div>
+}
+<div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+
+<form asp-controller="Account" asp-action="EnterSmsCode" method="post" autocomplete="off">
+    <input type="hidden" asp-for="Email" />
+    <div class="field">
+        <label asp-for="Code"></label>
+        <input asp-for="Code" class="otp-input" type="text" inputmode="numeric" pattern="\s*[0-9]{6}\s*"
+               maxlength="8" autocomplete="one-time-code" placeholder="••••••" autofocus />
+        <span asp-validation-for="Code" class="hint" style="color:var(--coral);"></span>
+    </div>
+    <button type="submit" class="btn btn-primary btn-block btn-lg">Verify code</button>
+</form>
+
+<form asp-controller="Account" asp-action="ResendSmsCode" method="post" class="otp-resend">
+    <input type="hidden" name="email" value="@Model.Email" />
+    <span>Didn't get it?</span>
+    <button type="submit" class="btn-text">Send a new code</button>
+</form>
+
+<div class="switch-line">
+    <a asp-controller="Account" asp-action="AnswerSecurityQuestions" asp-route-email="@Model.Email" style="color:var(--teal);">Answer my security questions instead</a>
+    &nbsp;·&nbsp;
+    <a asp-controller="Account" asp-action="Login" style="color:var(--teal);">Back to sign in</a>
+</div>

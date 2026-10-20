@@ -1,0 +1,101 @@
+@{
+    // Sidebar identity. Pages may set ViewData["UserName"]; otherwise it comes
+    // from the sign-in cookie, so every page shows it (several pages used to
+    // leave it blank) and a renamed user sees the new name immediately.
+    var sidebarName = ViewData["UserName"] as string
+                      ?? User.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value
+                      ?? "Admin";
+    var sidebarInitials = string.Concat(sidebarName.Split(' ', StringSplitOptions.RemoveEmptyEntries).Take(3).Select(p => char.ToUpperInvariant(p[0])));
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] — CareerSync AI Admin</title>
+    <link rel="stylesheet" href="~/css/custom.css" asp-append-version="true" />
+</head>
+<body>
+    <div class="dash-shell">
+        <aside class="sidebar">
+            @await Html.PartialAsync("_Logo", "dark")
+
+            <div class="side-group-label">PLATFORM</div>
+            <div class="side-nav">
+                <a class="side-link @(ViewData["Active"] as string == "Overview" || ViewData["Active"] == null ? "active" : "")" asp-controller="Admin" asp-action="Index">
+                    <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /></svg>
+                    Overview
+                </a>
+                <a class="side-link @(ViewData["Active"] as string == "Graduates" ? "active" : "")" asp-controller="Admin" asp-action="Graduates">
+                    <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3.5" /><path d="M2.5 20c0-3.5 3-6 6.5-6s6.5 2.5 6.5 6" /><circle cx="18" cy="9" r="2.5" /><path d="M15.5 14c2.8.3 4.5 2.4 4.5 6" /></svg>
+                    Graduates
+                </a>
+                <a class="side-link @(ViewData["Active"] as string == "SkillsDictionary" ? "active" : "")" asp-controller="Admin" asp-action="SkillsDictionary">
+                    <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h10" /></svg>
+                    Skills dictionary
+                </a>
+                <a class="side-link @(ViewData["Active"] as string == "MatchingAlgorithm" ? "active" : "")" asp-controller="Admin" asp-action="MatchingAlgorithm">
+                    <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6" /></svg>
+                    Matching algorithm
+                </a>
+                <a class="side-link @(ViewData["Active"] as string == "AuditLogs" ? "active" : "")" asp-controller="Admin" asp-action="AuditLogs">
+                    <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4" /><circle cx="12" cy="12" r="9" /></svg>
+                    Audit logs
+                </a>
+                <a class="side-link @(ViewData["Active"] as string == "Reports" ? "active" : "")" asp-controller="Admin" asp-action="Reports">
+                    <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3H6a2 2 0 00-2 2v14a2 2 0 002 2h12a2 2 0 002-2V9z" /><path d="M14 3v6h6" /><path d="M12 12v6" /><path d="M9 15l3 3 3-3" /></svg>
+                    Reports
+                </a>
+                <a class="side-link @(ViewData["Active"] as string == "Reviews" ? "active" : "")" asp-controller="Admin" asp-action="Reviews">
+                    <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 17.3l-6.16 3.6 1.64-6.99-5.34-4.62 7.02-.61L12 2l2.84 6.68 7.02.61-5.34 4.62 1.64 6.99z" /></svg>
+                    Reviews
+                </a>
+            </div>
+
+            <div class="side-group-label">ACCOUNT</div>
+            <div class="side-nav">
+                <a class="side-link @(ViewData["Active"] as string == "Profile" ? "active" : "")" asp-controller="Admin" asp-action="Profile">
+                    <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4" /><path d="M4 21c0-4 4-6 8-6s8 2 8 6" /></svg>
+                    Profile
+                </a>
+                <a class="side-link @(ViewData["Active"] as string == "ChangePassword" ? "active" : "")" asp-controller="Account" asp-action="ChangePassword">
+                    <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="11" width="16" height="9" rx="2" /><path d="M8 11V7a4 4 0 018 0v4" /></svg>
+                    Change password
+                </a>
+                <form asp-controller="Account" asp-action="Logout" method="post" style="margin:0;">
+                    <button type="submit" class="side-link side-link-button">
+                        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" /><path d="M16 17l5-5-5-5" /><path d="M21 12H9" /></svg>
+                        Log out
+                    </button>
+                </form>
+            </div>
+
+            <div class="side-foot">
+                <div class="user-chip">
+                    <div class="avatar" style="background:linear-gradient(135deg,var(--navy),var(--slate));">@sidebarInitials</div>
+                    <div>
+                        <div class="name">@sidebarName</div>
+                        <div class="role">ADMINISTRATOR</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="dash-main">
+            <div class="dash-topbar">
+                <h1>@ViewData["PageTitle"]</h1>
+                <div style="display:flex; align-items:center; gap:18px;">
+                    <form class="search-box" asp-controller="Admin" asp-action="Graduates" method="get" role="search">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#93A2AF" stroke-width="2"><circle cx="11" cy="11" r="7" /><path d="M21 21l-4-4" /></svg>
+                        <input name="search" value="@Context.Request.Query["search"]" placeholder="Search graduates by name, email…" aria-label="Search graduates" />
+                    </form>
+                    <div class="avatar" style="width:34px;height:34px;font-size:12px; background:linear-gradient(135deg,var(--navy),var(--slate));">@sidebarInitials</div>
+                </div>
+            </div>
+            <div class="dash-body">
+                @RenderBody()
+            </div>
+        </main>
+    </div>
+</body>
+</html>

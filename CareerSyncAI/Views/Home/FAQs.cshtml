@@ -1,0 +1,125 @@
+﻿@{
+    ViewData["Title"] = "FAQs";
+}
+
+
+<section class="bg-navy" style="padding: 3.5rem 0 4.5rem;">
+    <div class="container">
+        <span class="eyebrow on-dark"><i class="fa-solid fa-circle-question me-1"></i> Frequently Asked Questions</span>
+        <h1 class="display-font fw-bold mt-3" style="color:#fff; font-size: clamp(2rem, 4vw, 3rem); max-width: 700px;">
+            Everything you're wondering before you upload.
+        </h1>
+        <p class="mt-3" style="color: var(--csa-slate-light); max-width: 600px; font-size: 1.05rem;">
+            Can't find your answer here? Reach out and we'll get back to you directly.
+        </p>
+    </div>
+</section>
+
+
+<section class="section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-9">
+
+                <div class="accordion csa-accordion" id="faqAccordion">
+
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                                <i class="fa-solid fa-scale-balanced me-3"></i> How is my compatibility score calculated?
+                            </button>
+                        </h2>
+                        <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                We parse both your CV and the job description, then compare them across
+                                weighted categories — skills, experience, and qualifications matter more
+                                or less depending on how the specific listing emphasises them. The result
+                                is a single score with a full breakdown behind it, not a black box.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                                <i class="fa-solid fa-magnifying-glass-chart me-3"></i> What exactly is a "skills gap analysis"?
+                            </button>
+                        </h2>
+                        <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                It's a ranked list of the requirements in the job description that your
+                                CV doesn't currently demonstrate — ordered by how much each one is
+                                affecting your overall score, so you know what to prioritise first.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                                <i class="fa-solid fa-shield-halved me-3"></i> How is my data protected?
+                            </button>
+                        </h2>
+                        <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                CareerSync AI is built with POPIA compliance in mind. Your CV and any job
+                                descriptions you submit are used only to generate your own results — they
+                                are never sold or shared with third parties for advertising purposes.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
+                                <i class="fa-solid fa-file-arrow-up me-3"></i> What file formats can I upload?
+                            </button>
+                        </h2>
+                        <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Upload your CV as a PDF or a plain-text (.txt) file, up to 5 MB, or paste its text straight into the analysis form. 
+                                Use a PDF saved from Word or Google Docs. Scanned CVs are images, so their text can’t be read. For a Word document, 
+                                use File → Save As → PDF first.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq5">
+                                <i class="fa-solid fa-robot me-3"></i> How is this different from an ATS keyword checker?
+                            </button>
+                        </h2>
+                        <div id="faq5" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Keyword checkers tell you whether a word appears. CareerSync AI weighs
+                                requirements by importance, identifies genuine skills gaps rather than
+                                just missing terms, and gives you a prioritised plan — closer to how a
+                                careers advisor would review your application.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq6">
+                                <i class="fa-solid fa-graduation-cap me-3"></i> Is CareerSync AI only for UFS graduates?
+                            </button>
+                        </h2>
+                        <div id="faq6" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                The platform was designed with University of the Free State graduates in
+                                mind as its primary audience, but the matching and scoring engine works
+                                for any CV and job description combination.
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+

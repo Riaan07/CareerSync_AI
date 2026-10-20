@@ -1,0 +1,36 @@
+@model MessagesViewModel
+@{
+    ViewData["Title"] = "Messages";
+    ViewData["PageTitle"] = "Messages";
+    ViewData["Active"] = "Messages";
+    Layout = "_AppUserLayout";
+}
+
+<div class="form-page-wide">
+    <div class="card">
+        <div class="card-head">
+            <div>
+                <h3>Messages from CareerSync AI</h3>
+                <div class="meta">Notes from your careers office — arrive here in real time while you're signed in.</div>
+            </div>
+        </div>
+
+        <div id="message-list" class="message-list">
+            @if (Model.Messages.Count > 0)
+            {
+                @foreach (var m in Model.Messages.OrderBy(m => m.SentAt))
+                {
+                    <div class="message-bubble">
+                        <div class="mb-from">CAREERSYNC AI ADMIN</div>
+                        <div class="mb-content">@m.Content</div>
+                        <div class="mb-time">@m.SentAt.ToString("d MMM, HH:mm")</div>
+                    </div>
+                }
+            }
+            else
+            {
+                <p class="message-empty" id="message-empty-placeholder">Nothing here yet — messages from your careers office will show up in real time.</p>
+            }
+        </div>
+    </div>
+</div>

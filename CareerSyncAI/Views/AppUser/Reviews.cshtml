@@ -1,0 +1,100 @@
+@model ReviewsListViewModel
+@{
+    ViewData["Title"] = "Reviews";
+    ViewData["PageTitle"] = "Reviews";
+    ViewData["Active"] = "Reviews";
+    Layout = "_AppUserLayout";
+}
+
+@if (ViewData["StatusMessage"] is string status)
+{
+    <div class="status-banner">@status</div>
+}
+
+<div class="form-page-wide">
+    <div class="card" style="margin-bottom:20px;">
+        <div class="card-head">
+            <div>
+                <h3>@(Model.MyReview != null ? "Update your review" : "Rate CareerSync AI")</h3>
+                <div class="meta">Your feedback is visible to other graduates and to the admin team.</div>
+            </div>
+        </div>
+
+        <form asp-controller="AppUser" asp-action="SubmitReview" method="post">
+            <div class="field">
+                <label>Your rating</label>
+                <div class="star-input">
+                    @{
+                        var current = Model.MyReview?.Rating ?? 0;
+                    }
+                    @if (current == 5) { <input type="radio" id="star5" name="Rating" value="5" checked /> } else { <input type="radio" id="star5" name="Rating" value="5" /> }
+                    <label for="star5">★</label>
+                    @if (current == 4) { <input type="radio" id="star4" name="Rating" value="4" checked /> } else { <input type="radio" id="star4" name="Rating" value="4" /> }
+                    <label for="star4">★</label>
+                    @if (current == 3) { <input type="radio" id="star3" name="Rating" value="3" checked /> } else { <input type="radio" id="star3" name="Rating" value="3" /> }
+                    <label for="star3">★</label>
+                    @if (current == 2) { <input type="radio" id="star2" name="Rating" value="2" checked /> } else { <input type="radio" id="star2" name="Rating" value="2" /> }
+                    <label for="star2">★</label>
+                    @if (current == 1) { <input type="radio" id="star1" name="Rating" value="1" checked /> } else { <input type="radio" id="star1" name="Rating" value="1" /> }
+                    <label for="star1">★</label>
+                </div>
+            </div>
+            <div class="field">
+                <label>Comment</label>
+                <textarea name="Comment" rows="4" maxlength="1000" placeholder="What's your experience with CareerSync AI been like?" required>@(Model.MyReview?.Comment)</textarea>
+            </div>
+            <button type="submit" class="btn btn-teal">@(Model.MyReview != null ? "Update review" : "Submit review")</button>
+        </form>
+    </div>
+
+    <div class="card">
+        <div class="card-head">
+            <div>
+                <h3>What graduates are saying</h3>
+                <div class="meta">@Model.TotalReviews review@(Model.TotalReviews == 1 ? "" : "s")</div>
+            </div>
+        </div>
+
+        @if (Model.TotalReviews > 0)
+        {
+            <div class="review-summary">
+                <div class="avg">@Model.AverageRating.ToString("0.0")</div>
+                <div class="meta">
+                    <div class="star-display">
+                        @for (var i = 1; i <= 5; i++)
+                        {
+                            <span class="@(i <= Math.Round(Model.AverageRating) ? "filled" : "")">★</span>
+                        }
+                    </div>
+                    out of 5, based on @Model.TotalReviews review@(Model.TotalReviews == 1 ? "" : "s")
+                </div>
+            </div>
+
+            @foreach (var r in Model.Reviews)
+            {
+                <div class="review-item @(r.IsCurrentUser ? "mine" : "")">
+                    <div class="review-head">
+                        <div>
+                            <div class="review-name">@r.GraduateName @(r.IsCurrentUser ? "(You)" : "")</div>
+                            <div class="review-role">@(r.Qualification ?? "Graduate")</div>
+                        </div>
+                        <div style="text-align:right;">
+                            <div class="star-display">
+                                @for (var i = 1; i <= 5; i++)
+                                {
+                                    <span class="@(i <= r.Rating ? "filled" : "")">★</span>
+                                }
+                            </div>
+                            <div class="review-date">@r.CreatedAt.ToString("d MMM yyyy")@(r.UpdatedAt != null ? " (edited)" : "")</div>
+                        </div>
+                    </div>
+                    <p>@r.Comment</p>
+                </div>
+            }
+        }
+        else
+        {
+            <p style="font-size:13.5px; color:var(--slate-light); margin:0;">No reviews yet — be the first to share your experience.</p>
+        }
+    </div>
+</div>

@@ -1,0 +1,95 @@
+@model MyCvViewModel
+@{
+    ViewData["Title"] = "My CV";
+    ViewData["PageTitle"] = "My CV";
+    ViewData["Active"] = "MyCv";
+    Layout = "_AppUserLayout";
+}
+
+@if (ViewData["StatusMessage"] is string status)
+{
+    <div class="status-banner">@status</div>
+}
+
+<div class="form-page-wide">
+    <div class="card">
+        <div class="card-head">
+            <div>
+                <h3>Your CV</h3>
+                <div class="meta">@(Model.CurrentCv != null ? $"Last updated {Model.CurrentCv.UploadedAt:d MMM yyyy}" : "No CV on file yet")</div>
+            </div>
+            @if (Model.CurrentCv != null)
+            {
+                <span class="pill pill-teal">@Model.CurrentCv.FileName</span>
+            }
+        </div>
+
+        @if (Model.CurrentCv != null)
+        {
+            <div style="margin-bottom:18px;">
+                <div class="meta" style="margin-bottom:10px; font-family:'IBM Plex Mono'; font-size:11px; letter-spacing:.06em; color:var(--slate-light);">SKILLS DETECTED</div>
+                <div class="chip-wrap">
+                    @foreach (var skill in Model.CurrentCv.ExtractedSkills)
+                    {
+                        <span class="chip chip-ok">@skill</span>
+                    }
+                    @if (Model.CurrentCv.ExtractedSkills.Count == 0)
+                    {
+                        <span style="font-size:13px; color:var(--slate-light);">None detected — try updating your CV with more specific skill keywords.</span>
+                    }
+                </div>
+            </div>
+
+            @if (Model.MatchesLinkedToCv > 0)
+            {
+                <div class="status-banner" style="background:rgba(242,163,64,0.1); border-color:rgba(242,163,64,0.3); color:#C97F1F;">
+                    This CV is linked to @Model.MatchesLinkedToCv match score@(Model.MatchesLinkedToCv == 1 ? "" : "s"). Updating it below will automatically recalculate all of them.
+                </div>
+            }
+
+            <form asp-controller="AppUser" asp-action="UpdateCv" method="post">
+                <div class="field">
+                    <label>Edit CV text</label>
+                    <textarea name="cvText" rows="10">@Model.CurrentCv.RawText</textarea>
+                    <div class="hint">Editing this and saving re-scans for skills and refreshes every match score linked to this CV.</div>
+                </div>
+                <button type="submit" class="btn btn-teal btn-lg">Update CV &amp; refresh scores</button>
+            </form>
+        }
+        else
+        {
+            <p style="font-size:13.5px; color:var(--slate-light); margin:0 0 16px;">You haven't analysed a CV yet — upload one to get started.</p>
+            <a class="btn btn-primary" asp-controller="AppUser" asp-action="Analyze">+ Analyse your CV</a>
+        }
+    </div>
+
+    @if (Model.CurrentCv != null)
+    {
+        <div class="card" style="margin-top:20px;">
+            <div class="card-head">
+                <div>
+                    <h3>Analyse this CV against a new job</h3>
+                    <div class="meta">Uses your CV exactly as it stands above — no need to paste it again.</div>
+                </div>
+            </div>
+
+            <form asp-controller="AppUser" asp-action="AnalyzeWithCurrentCv" method="post">
+                <div class="field-grid">
+                    <div class="field">
+                        <label>Job title</label>
+                        <input name="jobTitle" type="text" placeholder="Junior Software Developer" required />
+                    </div>
+                    <div class="field">
+                        <label>Company (optional)</label>
+                        <input name="company" type="text" placeholder="Example Tech Solutions" />
+                    </div>
+                </div>
+                <div class="field">
+                    <label>Job description</label>
+                    <textarea name="jobDescriptionText" rows="7" placeholder="Paste the full job description here..." required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary btn-lg">Analyse match</button>
+            </form>
+        </div>
+    }
+</div>

@@ -1,0 +1,75 @@
+﻿@{
+    ViewData["Title"] = "Reports";
+    ViewData["PageTitle"] = "Reports";
+    ViewData["Active"] = "Reports";
+    Layout = "_AdminLayout";
+    var today = DateTime.Today;
+}
+
+@if (ViewData["StatusMessage"] is string status)
+{
+    <div class="status-banner">@status</div>
+}
+
+<div class="form-page">
+    <div class="card">
+        <div class="card-head">
+            <div>
+                <h3>Download an Excel report</h3>
+                <div class="meta">A formatted workbook (.xlsx) that opens in Excel, Google Sheets or LibreOffice, ready to print on A4.</div>
+            </div>
+        </div>
+
+        <form asp-controller="Admin" asp-action="DownloadReport" method="get" id="report-form">
+            <div class="field-grid">
+                <div class="field">
+                    <label for="from">From</label>
+                    <input type="date" id="from" name="from" max="@today.ToString("yyyy-MM-dd")" />
+                </div>
+                <div class="field">
+                    <label for="to">To</label>
+                    <input type="date" id="to" name="to" max="@today.ToString("yyyy-MM-dd")" />
+                </div>
+            </div>
+            <div class="hint" style="margin:-6px 0 14px;">Leave both dates empty for all time.</div>
+
+            <div class="report-presets">
+                <span>Quick pick:</span>
+                <button type="button" class="btn-text" data-days="7">Last 7 days</button>
+                <button type="button" class="btn-text" data-days="30">Last 30 days</button>
+                <button type="button" class="btn-text" data-days="90">Last 90 days</button>
+                <button type="button" class="btn-text" data-days="">All time</button>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block btn-lg">Download Excel report</button>
+        </form>
+
+        <div class="field-section-label" style="margin-top:24px;">WHAT'S IN THE WORKBOOK</div>
+        <ul class="report-sheets">
+            <li><b>Summary</b>: graduates, analyses, average match score, how many are ready to apply, and review ratings</li>
+            <li><b>Graduates</b>: every graduate with their CVs, analyses, latest and best score (all time)</li>
+            <li><b>Analyses</b>: each CV / job comparison with its scores, matched skills and gaps</li>
+            <li><b>Skill gaps</b>: the most commonly missing skills and how many graduates they affect</li>
+            <li><b>Reviews</b>: every rating and comment in the period</li>
+        </ul>
+    </div>
+</div>
+
+<script>
+    // Quick-pick buttons fill in the date range.
+    (function () {
+        var from = document.getElementById("from"), to = document.getElementById("to");
+        function iso(d) {   // local date, yyyy-MM-dd
+            return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+        }
+        document.querySelectorAll(".report-presets [data-days]").forEach(function (b) {
+            b.addEventListener("click", function () {
+                if (!b.dataset.days) { from.value = ""; to.value = ""; return; }
+                var end = new Date(), start = new Date();
+                start.setDate(end.getDate() - parseInt(b.dataset.days, 10) + 1);
+                from.value = iso(start); to.value = iso(end);
+            });
+        });
+    })();
+</script>
+

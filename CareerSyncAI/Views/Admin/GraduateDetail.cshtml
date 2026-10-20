@@ -1,0 +1,142 @@
+@model GraduateDetailViewModel
+@{
+    ViewData["Title"] = Model.FullName;
+    ViewData["PageTitle"] = "Graduate Detail";
+    ViewData["Active"] = "Graduates";
+    ViewData["UserName"] = User.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value ?? "Admin";
+    var nameForInitials = ViewData["UserName"] as string ?? "Admin";
+    ViewData["UserInitials"] = string.Join("", nameForInitials.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(p => p[0])).ToUpper();
+    Layout = "_AdminLayout";
+    var initials = string.Join("", Model.FullName.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(p => p[0])).ToUpper();
+}
+
+@if (ViewData["StatusMessage"] is string status)
+{
+    <div class="status-banner">@status</div>
+}
+
+<div class="card" style="margin-bottom:20px;">
+    <div class="profile-hero" style="border-bottom:none; margin-bottom:0; padding-bottom:0;">
+        <div class="avatar" style="background:linear-gradient(135deg,var(--teal),var(--amber));">@initials</div>
+        <div>
+            <h2>@Model.FullName</h2>
+            <div class="hero-email">@Model.Email &middot; @(Model.Qualification ?? "No qualification on file")</div>
+        </div>
+        <div style="margin-left:auto; display:flex; gap:10px;">
+            <a class="btn btn-ghost" asp-controller="Admin" asp-action="EditGraduate" asp-route-id="@Model.GraduateId">Edit</a>
+            <form asp-controller="Admin" asp-action="DeleteGraduate" method="post"
+                  onsubmit="return confirm('Delete @Model.FullName\'s account? This removes their CVs, analyses and messages permanently.');">
+                <input type="hidden" name="id" value="@Model.GraduateId" />
+                <button type="submit" class="btn btn-ghost" style="color:var(--coral); border-color:rgba(232,92,74,0.3);">Delete account</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="dash-grid">
+    <div>
+        <div class="card" style="margin-bottom:20px;">
+            <div class="card-head">
+                <div><h3>Contact &amp; academic details</h3></div>
+                <span class="role-badge @(Model.IsActive ? "role-grad" : "")" style="@(Model.IsActive ? "" : "background:rgba(91,107,124,0.12); color:var(--slate);")">@(Model.IsActive ? "ACTIVE" : "INACTIVE")</span>
+            </div>
+            <div class="bar-row"><div class="bar-top"><span>Phone</span><span class="mono">@(Model.PhoneNumber ?? "—")</span></div></div>
+            <div class="bar-row"><div class="bar-top"><span>Student number</span><span class="mono">@(Model.StudentNumber ?? "—")</span></div></div>
+            <div class="bar-row"><div class="bar-top"><span>LinkedIn</span><span class="mono">@(Model.LinkedInUrl ?? "—")</span></div></div>
+            <div class="bar-row" style="margin-bottom:0;"><div class="bar-top"><span>Joined</span><span class="mono">@Model.CreatedAt.ToString("d MMM yyyy")</span></div></div>
+        </div>
+
+        <div class="card" style="margin-bottom:20px;">
+            <div class="card-head">
+                <div>
+                    <h3>Current CV</h3>
+                    <div class="meta">@(Model.CurrentCv != null ? $"Uploaded {Model.CurrentCv.UploadedAt:d MMM yyyy}" : "No CV on file")</div>
+                </div>
+                @if (Model.CurrentCv != null)
+                {
+                    <span class="pill pill-teal">@Model.CurrentCv.FileName</span>
+                }
+            </div>
+            @if (Model.CurrentCv != null)
+            {
+                <div class="meta" style="margin-bottom:10px; font-family:'IBM Plex Mono'; font-size:11px; letter-spacing:.06em; color:var(--slate-light);">SKILLS DETECTED</div>
+                <div class="chip-wrap" style="margin-bottom:18px;">
+                    @foreach (var skill in Model.CurrentCv.ExtractedSkills)
+                    {
+                        <span class="chip chip-ok">@skill</span>
+                    }
+                    @if (Model.CurrentCv.ExtractedSkills.Count == 0)
+                    {
+                        <span style="font-size:13px; color:var(--slate-light);">None detected.</span>
+                    }
+                </div>
+                <div class="meta" style="margin-bottom:10px; font-family:'IBM Plex Mono'; font-size:11px; letter-spacing:.06em; color:var(--slate-light);">RAW TEXT</div>
+                <p style="font-size:13px; color:var(--slate); line-height:1.6; white-space:pre-wrap; background:var(--mist); padding:14px; border-radius:10px; margin:0;">@Model.CurrentCv.RawText</p>
+            }
+            else
+            {
+                <p style="font-size:13.5px; color:var(--slate-light); margin:0;">This graduate hasn't analysed a CV yet.</p>
+            }
+        </div>
+
+        <div class="card">
+            <div class="card-head">
+                <div><h3>Analysis history</h3><div class="meta">@Model.MatchHistory.Count comparison@(Model.MatchHistory.Count == 1 ? "" : "s")</div></div>
+            </div>
+            @if (Model.MatchHistory.Count > 0)
+            {
+                <table class="recent">
+                    <tr><th>Matched against</th><th>Date</th><th>Score</th></tr>
+                    @foreach (var m in Model.MatchHistory)
+                    {
+                        var badgeColor = m.Score >= 70 ? "background:rgba(14,156,143,0.1); color:var(--teal-dark);"
+                                        : m.Score >= 50 ? "background:rgba(242,163,64,0.15); color:#C97F1F;"
+                                        : "background:rgba(232,92,74,0.12); color:var(--coral);";
+                        <tr>
+                            <td>@m.JobTitle<div class="sub">@m.Company</div></td>
+                            <td>@m.Date.ToString("d MMM yyyy")</td>
+                            <td><span class="score-badge" style="@badgeColor">@m.Score%</span></td>
+                        </tr>
+                    }
+                </table>
+            }
+            else
+            {
+                <p style="font-size:13.5px; color:var(--slate-light); margin:0;">No analyses yet.</p>
+            }
+        </div>
+    </div>
+
+    <div>
+        <div class="card">
+            <div class="card-head">
+                <div><h3>Message @Model.FullName.Split(' ').First()</h3><div class="meta">Delivered instantly if they're online</div></div>
+            </div>
+
+            @if (Model.Messages.Count > 0)
+            {
+                <div class="message-list" style="margin-bottom:18px;">
+                    @foreach (var m in Model.Messages.OrderBy(m => m.SentAt))
+                    {
+                        <div class="message-bubble">
+                            <div class="mb-content">@m.Content</div>
+                            <div class="mb-time">@m.SentAt.ToString("d MMM, HH:mm")</div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <p class="message-empty">No messages sent yet.</p>
+            }
+
+            <form asp-controller="Admin" asp-action="SendMessage" method="post">
+                <input type="hidden" name="graduateId" value="@Model.GraduateId" />
+                <div class="field">
+                    <textarea name="content" rows="4" placeholder="Write a message..." required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Send message</button>
+            </form>
+        </div>
+    </div>
+</div>

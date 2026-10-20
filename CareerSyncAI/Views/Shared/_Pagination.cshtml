@@ -1,0 +1,29 @@
+@* Expects a PagedResult<T> passed via ViewData["Pagination"], and the
+   current action name so prev/next links stay on the right page. *@
+@{
+    var pagination = (dynamic)ViewData["Pagination"]!;
+    int pageNumber = pagination.PageNumber;
+    int totalPages = pagination.TotalPages;
+    bool hasPrevious = pagination.HasPrevious;
+    bool hasNext = pagination.HasNext;
+    var actionName = ViewData["PaginationAction"] as string ?? "Index";
+    // Optional: extra query-string values (e.g. search/filter) to keep when paging.
+    var routeValues = ViewData["PaginationRouteValues"] as Dictionary<string, string> ?? new Dictionary<string, string>();
+}
+
+@if (totalPages > 1)
+{
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-top:18px; padding-top:18px; border-top:1px solid var(--border);">
+        <span style="font-size:12.5px; color:var(--slate-light);">Page @pageNumber of @totalPages</span>
+        <div style="display:flex; gap:8px;">
+            @if (hasPrevious)
+            {
+                <a class="btn btn-ghost" style="padding:8px 16px; font-size:13px;" asp-action="@actionName" asp-all-route-data="routeValues" asp-route-page="@(pageNumber - 1)">← Previous</a>
+            }
+            @if (hasNext)
+            {
+                <a class="btn btn-ghost" style="padding:8px 16px; font-size:13px;" asp-action="@actionName" asp-all-route-data="routeValues" asp-route-page="@(pageNumber + 1)">Next →</a>
+            }
+        </div>
+    </div>
+}

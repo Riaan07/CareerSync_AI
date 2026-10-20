@@ -1,0 +1,180 @@
+@inject CareerSyncAI.Data.IRepositoryWrapper Repository
+@{
+    // Sidebar identity. Pages may set ViewData["UserName"]; otherwise it comes
+    // from the sign-in cookie, so every page shows it (several pages used to
+    // leave it blank) and a renamed user sees the new name immediately.
+    var sidebarName = ViewData["UserName"] as string
+                      ?? User.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value
+                      ?? "Graduate";
+    var sidebarInitials = string.Concat(sidebarName.Split(' ', StringSplitOptions.RemoveEmptyEntries).Take(3).Select(p => char.ToUpperInvariant(p[0])));
+}
+@{
+    // Unread count for the bell, so it's correct on every page load — not
+    // only when a message arrives live over SignalR.
+    var unreadMessages = 0;
+    if (int.TryParse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value, out var currentUserId))
+    {
+        unreadMessages = Repository.Message.GetByGraduateId(currentUserId).Count(m => !m.IsRead);
+    }
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] — CareerSync AI</title>
+    <link rel="stylesheet" href="~/css/custom.css" asp-append-version="true" />
+</head>
+<body>
+    <div class="dash-shell">
+        <aside class="sidebar">
+            @await Html.PartialAsync("_Logo", "dark")
+
+            <div class="side-group-label">MAIN</div>
+            <div class="side-nav">
+                <a class="side-link @(ViewData["Active"] as string == "Overview" ? "active" : "")" asp-controller="AppUser" asp-action="Index">
+                    <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /></svg>
+                    Overview
+                </a>
+                <a class="side-link @(ViewData["Active"] as string == "Analyze" ? "active" : "")" asp-controller="AppUser" asp-action="Analyze">
+                    <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 16V4M12 4l4 4M12 4L8 8" /><path d="M4 16v3a2 2 0 002 2h12a2 2 0 002-2v-3" /></svg>
+                    Analyse CV &amp; Job
+                </a>
+                <a class="side-link @(ViewData["Active"] as string == "History" ? "active" : "")" asp-controller="AppUser" asp-action="History">
+                    <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 109-9 9 9 0 00-6.4 2.6L3 8" /><path d="M3 3v5h5" /><path d="M12 7v5l3 3" /></svg>
+                    My analyses
+                </a>
+                <a class="side-link @(ViewData["Active"] as string == "Messages" ? "active" : "")" asp-controller="AppUser" asp-action="Messages">
+                    <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" /></svg>
+                    Messages
+                </a>
+                <a class="side-link @(ViewData["Active"] as string == "Reviews" ? "active" : "")" asp-controller="AppUser" asp-action="Reviews">
+                    <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 17.3l-6.16 3.6 1.64-6.99-5.34-4.62 7.02-.61L12 2l2.84 6.68 7.02.61-5.34 4.62 1.64 6.99z" /></svg>
+                    Reviews
+                </a>
+            </div>
+
+            <div class="side-group-label">ACCOUNT</div>
+            <div class="side-nav">
+                <a class="side-link @(ViewData["Active"] as string == "Profile" ? "active" : "")" asp-controller="AppUser" asp-action="Profile">
+                    <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4" /><path d="M4 21c0-4 4-6 8-6s8 2 8 6" /></svg>
+                    Profile
+                </a>
+                <a class="side-link @(ViewData["Active"] as string == "MyCv" ? "active" : "")" asp-controller="AppUser" asp-action="MyCv">
+                    <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V6a2 2 0 012-2h9l5 5v10a2 2 0 01-2 2H6a2 2 0 01-2-2z" /><path d="M9 13h6M9 17h4" /></svg>
+                    My CV
+                </a>
+                <a class="side-link @(ViewData["Active"] as string == "ChangePassword" ? "active" : "")" asp-controller="Account" asp-action="ChangePassword">
+                    <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="11" width="16" height="9" rx="2" /><path d="M8 11V7a4 4 0 018 0v4" /></svg>
+                    Change password
+                </a>
+                <form asp-controller="Account" asp-action="Logout" method="post" style="margin:0;">
+                    <button type="submit" class="side-link side-link-button">
+                        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" /><path d="M16 17l5-5-5-5" /><path d="M21 12H9" /></svg>
+                        Log out
+                    </button>
+                </form>
+            </div>
+
+            <div class="side-foot">
+                <div class="user-chip">
+                    <div class="avatar">@sidebarInitials</div>
+                    <div>
+                        <div class="name">@sidebarName</div>
+                        <div class="role">GRADUATE VIEW</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="dash-main">
+            <div class="dash-topbar">
+                <h1>@ViewData["PageTitle"]</h1>
+                <div style="display:flex; align-items:center; gap:18px;">
+                    <form class="search-box" asp-controller="AppUser" asp-action="History" method="get" role="search">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#93A2AF" stroke-width="2"><circle cx="11" cy="11" r="7" /><path d="M21 21l-4-4" /></svg>
+                        <input name="search" value="@Context.Request.Query["search"]" placeholder="Search matches, skills, courses…" aria-label="Search your analyses" />
+                    </form>
+                    <div class="topbar-right">
+                        <a class="icon-btn" id="notif-bell" asp-controller="AppUser" asp-action="Messages" style="text-decoration:none; position:relative;">
+                            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5B6B7C" stroke-width="2"><path d="M6 8a6 6 0 0112 0c0 7 3 9 3 9H3s3-2 3-9" /><path d="M10 21a2 2 0 004 0" /></svg>
+                            @if (unreadMessages > 0)
+                            {
+                                <span class="notif-badge-count">@unreadMessages</span>
+                            }
+                        </a>
+                        <div class="avatar" style="width:34px;height:34px;font-size:12px;">@sidebarInitials</div>
+                    </div>
+                </div>
+            </div>
+            <div class="dash-body">
+                @RenderBody()
+            </div>
+        </main>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/@@microsoft/signalr@@8.0.0/dist/browser/signalr.min.js"></script>
+    <script>
+        (function () {
+            var connection = new signalR.HubConnectionBuilder()
+                .withUrl("/hubs/messaging")
+                .withAutomaticReconnect()
+                .build();
+
+            connection.on("ReceiveMessage", function (msg) {
+                showToast(msg);
+                appendToMessageListIfPresent(msg);
+                bumpNotificationBadge();
+            });
+
+            connection.start().catch(function (err) {
+                console.error("SignalR connection failed:", err);
+            });
+
+            function showToast(msg) {
+                var toast = document.createElement("div");
+                toast.className = "live-toast";
+                toast.innerHTML = "<b>" + escapeHtml(msg.from) + "</b><br>" + escapeHtml(msg.content);
+                document.body.appendChild(toast);
+                setTimeout(function () { toast.remove(); }, 6000);
+            }
+
+            function appendToMessageListIfPresent(msg) {
+                var list = document.getElementById("message-list");
+                if (!list) return;
+                var placeholder = document.getElementById("message-empty-placeholder");
+                if (placeholder) placeholder.remove();
+
+                var bubble = document.createElement("div");
+                bubble.className = "message-bubble";
+                bubble.innerHTML =
+                    '<div class="mb-from">CAREERSYNC AI ADMIN</div>' +
+                    '<div class="mb-content">' + escapeHtml(msg.content) + '</div>' +
+                    '<div class="mb-time">' + escapeHtml(msg.sentAt) + '</div>';
+                list.appendChild(bubble);
+                list.scrollTop = list.scrollHeight;
+            }
+
+            function bumpNotificationBadge() {
+                var bell = document.getElementById("notif-bell");
+                if (!bell) return;
+                var badge = bell.querySelector(".notif-badge-count");
+                if (!badge) {
+                    badge = document.createElement("span");
+                    badge.className = "notif-badge-count";
+                    badge.textContent = "1";
+                    bell.appendChild(badge);
+                } else {
+                    badge.textContent = (parseInt(badge.textContent || "0", 10) + 1).toString();
+                }
+            }
+
+            function escapeHtml(text) {
+                var div = document.createElement("div");
+                div.textContent = text == null ? "" : text;
+                return div.innerHTML;
+            }
+        })();
+    </script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

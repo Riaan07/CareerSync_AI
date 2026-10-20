@@ -1,0 +1,93 @@
+@model ProfileViewModel
+@{
+    ViewData["Title"] = "Profile";
+    ViewData["PageTitle"] = "Profile";
+    ViewData["Active"] = "Profile";
+    Layout = "_AppUserLayout";
+    var initials = string.Join("", Model.FullName.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(p => p[0])).ToUpper();
+}
+
+@if (ViewData["StatusMessage"] is string status)
+{
+    <div class="status-banner">@status</div>
+}
+
+<div class="form-page-wide">
+    <div class="card">
+        <div class="profile-hero">
+            <div class="avatar">@initials</div>
+            <div>
+                <h2>@Model.FullName</h2>
+                <div class="hero-email">This is what a future employer's HR contact would see if you shared your profile.</div>
+            </div>
+        </div>
+
+        <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+
+        <form asp-controller="AppUser" asp-action="Profile" method="post">
+
+            <div class="field-section-label">CONTACT DETAILS</div>
+            <div class="field-grid">
+                <div class="field field-full">
+                    <label asp-for="FullName"></label>
+                    <div class="input-icon-wrap">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#93A2AF" stroke-width="2"><circle cx="12" cy="8" r="4" /><path d="M4 21c0-4 4-6 8-6s8 2 8 6" /></svg>
+                        <input asp-for="FullName" type="text" />
+                    </div>
+                    <span asp-validation-for="FullName" class="hint" style="color:var(--coral);"></span>
+                </div>
+                <div class="field">
+                    <label>Email</label>
+                    <div class="input-icon-wrap">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#93A2AF" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2" /><path d="M2 6l10 7 10-7" /></svg>
+                        <input value="@Model.Email" type="email" disabled style="background:#EDF1F4; color:var(--slate);" />
+                    </div>
+                    <div class="hint">Your sign-in — contact support to change it.</div>
+                </div>
+                <div class="field">
+                    <label asp-for="PhoneNumber"></label>
+                    <div class="input-icon-wrap">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#93A2AF" stroke-width="2"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012.1 4.2 2 2 0 014.1 2h3a2 2 0 012 1.7c.1.9.3 1.8.6 2.7a2 2 0 01-.5 2.1L8 9.7a16 16 0 006 6l1.2-1.2a2 2 0 012.1-.5c.9.3 1.8.5 2.7.6a2 2 0 011.7 2z" /></svg>
+                        <input asp-for="PhoneNumber" type="tel" placeholder="082 123 4567" />
+                    </div>
+                    <span asp-validation-for="PhoneNumber" class="hint" style="color:var(--coral);"></span>
+                </div>
+            </div>
+
+            <div class="field-section-label">ACADEMIC DETAILS</div>
+            <div class="field-grid">
+                <div class="field field-full">
+                    <label asp-for="Qualification"></label>
+                    <div class="input-icon-wrap">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#93A2AF" stroke-width="2"><path d="M2 9l10-5 10 5-10 5-10-5z" /><path d="M6 11v5c0 1.5 2.7 3 6 3s6-1.5 6-3v-5" /></svg>
+                        <input asp-for="Qualification" type="text" placeholder="BSc Computer Science" />
+                    </div>
+                </div>
+                
+            </div>
+
+            <div class="field-section-label">ONLINE PRESENCE</div>
+            <div class="field-grid">
+                <div class="field field-full">
+                    <label asp-for="LinkedInUrl"></label>
+                    <div class="input-icon-wrap">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#93A2AF" stroke-width="2"><rect x="2" y="9" width="4" height="12" /><circle cx="4" cy="4" r="2" /><path d="M10 21v-7a2 2 0 012-2h0a4 4 0 014 4v5M10 12v9" /></svg>
+                        <input asp-for="LinkedInUrl" type="url" placeholder="https://linkedin.com/in/..." />
+                    </div>
+                    <span asp-validation-for="LinkedInUrl" class="hint" style="color:var(--coral);"></span>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-lg" style="margin-top:8px; min-width:200px;">Save changes</button>
+        </form>
+    </div>
+
+    <div class="card" style="margin-top:20px; display:flex; align-items:center; justify-content:space-between;">
+        <div>
+            <h3 style="font-size:15px; margin-bottom:4px;">Your CV</h3>
+            <div class="meta">View, update, and analyse against a new job — all in one place.</div>
+        </div>
+        <a class="btn btn-teal" asp-controller="AppUser" asp-action="MyCv">Go to My CV →</a>
+    </div>
+</div>
+

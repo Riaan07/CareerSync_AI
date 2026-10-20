@@ -1,0 +1,71 @@
+@model ReviewsListViewModel
+@{
+    ViewData["Title"] = "Reviews";
+    ViewData["PageTitle"] = "Reviews";
+    ViewData["Active"] = "Reviews";
+    ViewData["UserName"] = User.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value ?? "Admin";
+    var nameForInitials = ViewData["UserName"] as string ?? "Admin";
+    ViewData["UserInitials"] = string.Join("", nameForInitials.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(p => p[0])).ToUpper();
+    Layout = "_AdminLayout";
+}
+
+@if (ViewData["StatusMessage"] is string status)
+{
+    <div class="status-banner">@status</div>
+}
+
+<div class="card">
+    <div class="card-head">
+        <div>
+            <h3>Graduate reviews</h3>
+            <div class="meta">What graduates are saying about the platform</div>
+        </div>
+    </div>
+
+    @if (Model.TotalReviews > 0)
+    {
+        <div class="review-summary">
+            <div class="avg">@Model.AverageRating.ToString("0.0")</div>
+            <div class="meta">
+                <div class="star-display">
+                    @for (var i = 1; i <= 5; i++)
+                    {
+                        <span class="@(i <= Math.Round(Model.AverageRating) ? "filled" : "")">★</span>
+                    }
+                </div>
+                out of 5, based on @Model.TotalReviews review@(Model.TotalReviews == 1 ? "" : "s")
+            </div>
+        </div>
+
+        @foreach (var r in Model.Reviews)
+        {
+            <div class="review-item">
+                <div class="review-head">
+                    <div>
+                        <div class="review-name">@r.GraduateName</div>
+                        <div class="review-role">@(r.Qualification ?? "Graduate")</div>
+                    </div>
+                    <div style="text-align:right;">
+                        <div class="star-display">
+                            @for (var i = 1; i <= 5; i++)
+                            {
+                                <span class="@(i <= r.Rating ? "filled" : "")">★</span>
+                            }
+                        </div>
+                        <div class="review-date">@r.CreatedAt.ToString("d MMM yyyy")@(r.UpdatedAt != null ? " (edited)" : "")</div>
+                        <form asp-controller="Admin" asp-action="DeleteReview" method="post" style="margin-top:6px;"
+                              onsubmit="return confirm('Remove this review? This can\'t be undone.');">
+                            <input type="hidden" name="id" value="@r.ReviewId" />
+                            <button type="submit" class="btn-text" style="color:var(--coral); font-size:12.5px;">Remove</button>
+                        </form>
+                    </div>
+                </div>
+                <p>@r.Comment</p>
+            </div>
+        }
+    }
+    else
+    {
+        <p style="font-size:13.5px; color:var(--slate-light); margin:0;">No reviews submitted yet.</p>
+    }
+</div>

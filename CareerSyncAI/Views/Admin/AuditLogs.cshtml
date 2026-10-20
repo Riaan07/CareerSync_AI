@@ -1,0 +1,40 @@
+@model AuditLogViewModel
+@{
+    ViewData["Title"] = "Audit Logs";
+    ViewData["PageTitle"] = "Audit Logs";
+    ViewData["Active"] = "AuditLogs";
+    ViewData["UserName"] = User.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value ?? "Admin";
+    var nameForInitials = ViewData["UserName"] as string ?? "Admin";
+    ViewData["UserInitials"] = string.Join("", nameForInitials.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(p => p[0])).ToUpper();
+    Layout = "_AdminLayout";
+}
+
+<div class="card">
+    <div class="card-head">
+        <div>
+            <h3>Audit trail</h3>
+            <div class="meta">@Model.Entries.TotalCount logged event@(Model.Entries.TotalCount == 1 ? "" : "s") — logins, profile changes, and admin actions</div>
+        </div>
+    </div>
+
+    @if (Model.Entries.TotalCount > 0)
+    {
+        <table class="recent">
+            <tr><th>Who</th><th>Action</th><th>Details</th><th>When</th></tr>
+            @foreach (var e in Model.Entries.Items)
+            {
+                <tr>
+                    <td style="font-weight:600;">@e.UserName</td>
+                    <td><span class="pill pill-teal">@e.ActionType</span></td>
+                    <td>@e.Description</td>
+                    <td class="sub">@e.Timestamp.ToString("d MMM yyyy, HH:mm")</td>
+                </tr>
+            }
+        </table>
+        @await Html.PartialAsync("_Pagination")
+    }
+    else
+    {
+        <p style="font-size:13.5px; color:var(--slate-light); margin:0;">No activity logged yet.</p>
+    }
+</div>

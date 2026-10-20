@@ -1,0 +1,33 @@
+@model LoginViewModel
+@{
+    ViewData["Title"] = "Sign in";
+    Layout = "_AuthLayout";
+}
+
+<h2>Welcome back</h2>
+<div class="sub">Sign in to see your latest match scores.</div>
+
+@if (ViewData["StatusMessage"] is string status)
+{
+    <div class="status-banner">@status</div>
+}
+<div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+
+<form asp-controller="Account" asp-action="Login" method="post">
+    <div class="field">
+        <label asp-for="Email"></label>
+        <input asp-for="Email" type="email" placeholder="email" />
+        <span asp-validation-for="Email" class="hint" style="color:var(--coral);"></span>
+    </div>
+    <div class="field">
+        <label asp-for="Password"></label>
+        <input asp-for="Password" type="password" placeholder="••••••••••" />
+        <span asp-validation-for="Password" class="hint" style="color:var(--coral);"></span>
+    </div>
+    <div class="row-between">
+        <label><input asp-for="RememberMe" /> Keep me signed in</label>
+        <a class="btn-text" style="font-size:13px;" asp-controller="Account" asp-action="ForgotPassword">Forgot password?</a>
+    </div>
+    <button type="submit" class="btn btn-primary btn-block btn-lg">Sign in</button>
+</form>
+<div class="switch-line">New to CareerSync? <b><a asp-controller="Account" asp-action="Register" style="color:var(--teal);">Create an account</a></b></div>

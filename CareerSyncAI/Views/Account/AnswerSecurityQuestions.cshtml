@@ -1,0 +1,27 @@
+@model AnswerSecurityQuestionsViewModel
+@{
+    ViewData["Title"] = "Answer your security questions";
+    Layout = "_AuthLayout";
+}
+
+<h2>Confirm it's you</h2>
+<div class="sub">Answer the security questions you chose for @Model.Email.</div>
+
+<div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+
+<form asp-controller="Account" asp-action="AnswerSecurityQuestions" method="post" autocomplete="off">
+    <input type="hidden" asp-for="Email" />
+    <div class="field">
+        <label asp-for="Answer1">@Model.Question1</label>
+        <input asp-for="Answer1" type="text" autocomplete="off" />
+        <span asp-validation-for="Answer1" class="hint" style="color:var(--coral);"></span>
+    </div>
+    <div class="field">
+        <label asp-for="Answer2">@Model.Question2</label>
+        <input asp-for="Answer2" type="text" autocomplete="off" />
+        <span asp-validation-for="Answer2" class="hint" style="color:var(--coral);"></span>
+    </div>
+    <div class="hint" style="margin:-6px 0 16px;">Capitals and extra spaces don't matter.</div>
+    <button type="submit" class="btn btn-primary btn-block btn-lg">Verify answers</button>
+</form>
+<div class="switch-line"><a asp-controller="Account" asp-action="ForgotPassword" style="color:var(--teal);">← Use a different email</a></div>
