@@ -67,7 +67,7 @@ if (!twilioOptions.IsConfigured)
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<CareerSyncDbContext>();
-    db.Database.Migrate();
+    db.Database.EnsureCreated();
 
     var repositoryWrapper = scope.ServiceProvider.GetRequiredService<IRepositoryWrapper>();
     SeedIdentity.Seed(repositoryWrapper);
